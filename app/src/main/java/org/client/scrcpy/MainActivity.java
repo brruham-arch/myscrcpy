@@ -1016,13 +1016,41 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
             ol.setEditMode(!ol.isEditMode());
             edit.setText(ol.isEditMode() ? "Selesai" : "Edit");
         });
-        findViewById(R.id.btn_add).setOnClickListener(v -> {
-            final android.widget.EditText et = new android.widget.EditText(this);
-            new android.app.AlertDialog.Builder(this).setTitle("Teks").setView(et)
-                .setPositiveButton("OK", (d, w) -> ol.addText(et.getText().toString()))
-                .setNegativeButton("Batal", null).show();
-        });
+        findViewById(R.id.btn_add).setOnClickListener(v ->
+            new android.app.AlertDialog.Builder(this)
+                .setItems(new String[]{"Teks", "Gambar/GIF"}, (dd, which) -> {
+                    if (which == 1) {
+                        Intent pick = new Intent(Intent.ACTION_GET_CONTENT);
+                        pick.setType("image/*");
+                        startActivityForResult(pick, 77);
+                    } else {
+                        final android.widget.EditText et = new android.widget.EditText(this);
+                        new android.app.AlertDialog.Builder(this).setTitle("Teks").setView(et)
+                            .setPositiveButton("OK", (d, w) -> ol.addText(et.getText().toString()))
+                            .setNegativeButton("Batal", null).show();
+                    }
+                }).show());
         findViewById(R.id.btn_del).setOnClickListener(v -> ol.removeSelected());
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req != 77 || res != RESULT_OK || data == null || data.getData() == null) return;
+        try {
+            java.io.File f = new java.io.File(getFilesDir(), "ov_" + System.currentTimeMillis());
+            java.io.InputStream in = getContentResolver().openInputStream(data.getData());
+            java.io.OutputStream out = new java.io.FileOutputStream(f);
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            in.close();
+            out.close();
+            OverlayLayer ol = findViewById(R.id.overlay_layer);
+            if (ol != null) ol.addImage(f);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupMirrorContentView() {
