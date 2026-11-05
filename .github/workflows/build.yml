@@ -12,7 +12,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - run: chmod +x gradlew && ./gradlew assembleDebug
+      - run: find . -name "*.apk"
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: "**/build/outputs/**/*.apk"
+          if-no-files-found: error
