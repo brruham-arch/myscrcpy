@@ -22,14 +22,10 @@ public class EditorActivity extends Activity {
         root.setBackgroundColor(Color.parseColor("#222222"));
 
         // placeholder game landscape (16:9) di tengah
-        View game = new View(this);
+        TextView game = new TextView(this); game.setText("AREA GAME"); game.setTextColor(Color.LTGRAY); game.setGravity(Gravity.CENTER);
         game.setBackgroundColor(Color.parseColor("#555555"));
         int w = getResources().getDisplayMetrics().widthPixels;
         root.addView(game, new FrameLayout.LayoutParams(w, w * 9 / 16, Gravity.CENTER));
-        TextView lbl = new TextView(this);
-        lbl.setText("AREA GAME");
-        lbl.setTextColor(Color.LTGRAY);
-        root.addView(lbl, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
 
         ol = new OverlayLayer(this);
         ol.setEditMode(true);
@@ -44,6 +40,38 @@ public class EditorActivity extends Activity {
         root.addView(bar, new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END));
         setContentView(root);
         ol.load("main");
+        android.content.SharedPreferences gp = getSharedPreferences("overlay", 0);
+        game.setTranslationX(gp.getFloat("gx", 0f) * w);
+        game.setTranslationY(gp.getFloat("gy", 0f) * w);
+        game.setScaleX(gp.getFloat("gs", 1f));
+        game.setScaleY(gp.getFloat("gs", 1f));
+        final android.view.ScaleGestureDetector sd = new android.view.ScaleGestureDetector(this,
+            new android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                @Override public boolean onScale(android.view.ScaleGestureDetector d) {
+                    float s = Math.max(0.3f, Math.min(game.getScaleX() * d.getScaleFactor(), 4f));
+                    game.setScaleX(s); game.setScaleY(s);
+                    return true;
+                }
+            });
+        final float[] last = new float[2];
+        game.setOnTouchListener((v, e) -> {
+            sd.onTouchEvent(e);
+            int a = e.getActionMasked();
+            if (a == android.view.MotionEvent.ACTION_DOWN) {
+                last[0] = e.getRawX(); last[1] = e.getRawY();
+            } else if (a == android.view.MotionEvent.ACTION_MOVE) {
+                if (e.getPointerCount() == 1 && !sd.isInProgress()) {
+                    game.setTranslationX(game.getTranslationX() + e.getRawX() - last[0]);
+                    game.setTranslationY(game.getTranslationY() + e.getRawY() - last[1]);
+                }
+                last[0] = e.getRawX(); last[1] = e.getRawY();
+            } else if (a == android.view.MotionEvent.ACTION_POINTER_UP) {
+                int i = e.getActionIndex() == 0 ? 1 : 0;
+                last[0] = e.getRawX() + (e.getX(i) - e.getX(0));
+                last[1] = e.getRawY() + (e.getY(i) - e.getY(0));
+            }
+            return true;
+        });
 
         add.setOnClickListener(v -> new AlertDialog.Builder(this)
             .setItems(new String[]{"Teks", "Gambar/GIF"}, (dd, which) -> {
@@ -61,6 +89,7 @@ public class EditorActivity extends Activity {
         del.setOnClickListener(v -> ol.removeSelected());
         save.setOnClickListener(v -> {
             ol.save("main");
+            getSharedPreferences("overlay", 0).edit().putFloat("gx", game.getTranslationX() / w).putFloat("gy", game.getTranslationY() / w).putFloat("gs", game.getScaleX()).apply();
             Toast.makeText(this, "Tersimpan", Toast.LENGTH_SHORT).show();
         });
     }

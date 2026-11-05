@@ -104,6 +104,7 @@ public class OverlayLayer extends FrameLayout {
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 selected = hit(e.getX(), e.getY());
+                if (selected == null) { invalidate(); return false; }
                 lastX = e.getX();
                 lastY = e.getY();
                 invalidate();

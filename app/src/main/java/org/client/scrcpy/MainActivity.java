@@ -896,7 +896,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
 
     @SuppressLint("SourceLockedOrientationActivity")
     private void applyClientOrientationFromRemote() {
-        if (true) { return; }
+        if (PreUtils.get(context, Constant.CONTROL_NO, false)) { return; }
         if (scrcpy == null) {
             return;
         }
@@ -1012,11 +1012,25 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
     private void setupOverlay() {
         final OverlayLayer ol = findViewById(R.id.overlay_layer);
         if (ol == null) return;
+        if (!PreUtils.get(context, Constant.CONTROL_NO, false)) {
+            ol.setVisibility(View.GONE);
+            View tb0 = findViewById(R.id.overlay_toolbar);
+            if (tb0 != null) tb0.setVisibility(View.GONE);
+            return;
+        }
         if (true) {
             ol.setEditMode(false);
             View tb = findViewById(R.id.overlay_toolbar);
             if (tb != null) tb.setVisibility(View.GONE);
             ol.load("main");
+            if (linearLayout != null) {
+                android.content.SharedPreferences gp = getSharedPreferences("overlay", 0);
+                float sw = getResources().getDisplayMetrics().widthPixels;
+                linearLayout.setTranslationX(gp.getFloat("gx", 0f) * sw);
+                linearLayout.setTranslationY(gp.getFloat("gy", 0f) * sw);
+                linearLayout.setScaleX(gp.getFloat("gs", 1f));
+                linearLayout.setScaleY(gp.getFloat("gs", 1f));
+            }
             return;
         }
         final android.widget.Button edit = findViewById(R.id.btn_edit);
@@ -1093,7 +1107,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
     @SuppressLint("ClickableViewAccessibility")
     private void start_screen_copy_magic() {
         stopStatusMonitor();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(PreUtils.get(context, Constant.CONTROL_NO, false) ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         setupMirrorContentView();
     }
 
