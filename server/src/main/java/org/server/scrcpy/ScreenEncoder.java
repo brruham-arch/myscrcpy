@@ -201,21 +201,21 @@ public class ScreenEncoder implements Device.RotationListener {
         format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
-        format.setInteger("max-bframes", 0);
+//        format.setInteger("max-bframes", 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            format.setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED);
+//            format.setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            format.setInteger(MediaFormat.KEY_PRIORITY, 0);
+//            format.setInteger(MediaFormat.KEY_PRIORITY, 0);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            format.setInteger(MediaFormat.KEY_LATENCY, 1);
+//            format.setInteger(MediaFormat.KEY_LATENCY, 1);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            format.setInteger(MediaFormat.KEY_OPERATING_RATE, frameRate);
+//            format.setInteger(MediaFormat.KEY_OPERATING_RATE, frameRate);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            format.setInteger(MediaFormat.KEY_LOW_LATENCY, 1);
+//            format.setInteger(MediaFormat.KEY_LOW_LATENCY, 1);
         }
         format.setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 100_000);
         return format;
