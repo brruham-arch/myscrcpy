@@ -1012,6 +1012,13 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
     private void setupOverlay() {
         final OverlayLayer ol = findViewById(R.id.overlay_layer);
         if (ol == null) return;
+        if (true) {
+            ol.setEditMode(false);
+            View tb = findViewById(R.id.overlay_toolbar);
+            if (tb != null) tb.setVisibility(View.GONE);
+            ol.load("main");
+            return;
+        }
         final android.widget.Button edit = findViewById(R.id.btn_edit);
         edit.setOnClickListener(v -> {
             ol.setEditMode(!ol.isEditMode());

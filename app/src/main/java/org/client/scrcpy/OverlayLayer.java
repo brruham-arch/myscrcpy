@@ -71,6 +71,7 @@ public class OverlayLayer extends FrameLayout {
         ImageView iv = new ImageView(getContext());
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
         Glide.with(getContext()).load(src).into(iv);
+        iv.setTag(String.valueOf(src));
         addView(iv, new LayoutParams(400, 400, Gravity.CENTER));
         selected = iv;
         invalidate();
@@ -136,5 +137,54 @@ public class OverlayLayer extends FrameLayout {
             float hh = selected.getHeight() * selected.getScaleY() / 2f;
             canvas.drawRect(cx - hw, cy - hh, cx + hw, cy + hh, border);
         }
+    }
+
+    public void save(String key) {
+        try {
+            org.json.JSONArray arr = new org.json.JSONArray();
+            float w = Math.max(1, getWidth()), h = Math.max(1, getHeight());
+            for (int i = 0; i < getChildCount(); i++) {
+                View v = getChildAt(i);
+                org.json.JSONObject o = new org.json.JSONObject();
+                if (v instanceof TextView) {
+                    o.put("t", "text");
+                    o.put("v", ((TextView) v).getText().toString());
+                } else if (v.getTag() != null) {
+                    o.put("t", "img");
+                    o.put("v", v.getTag().toString());
+                } else continue;
+                o.put("x", v.getTranslationX() / w);
+                o.put("y", v.getTranslationY() / h);
+                o.put("s", v.getScaleX());
+                arr.put(o);
+            }
+            getContext().getSharedPreferences("overlay", 0)
+                    .edit().putString(key, arr.toString()).apply();
+        } catch (Exception e) { }
+    }
+
+    public void load(String key) {
+        final String json = getContext().getSharedPreferences("overlay", 0)
+                .getString(key, null);
+        if (json == null) return;
+        post(() -> {
+            try {
+                org.json.JSONArray arr = new org.json.JSONArray(json);
+                float w = getWidth(), h = getHeight();
+                for (int i = 0; i < arr.length(); i++) {
+                    org.json.JSONObject o = arr.getJSONObject(i);
+                    if ("text".equals(o.getString("t"))) addText(o.getString("v"));
+                    else addImage(new java.io.File(o.getString("v")));
+                    View v = getChildAt(getChildCount() - 1);
+                    v.setTranslationX((float) o.getDouble("x") * w);
+                    v.setTranslationY((float) o.getDouble("y") * h);
+                    float sc = (float) o.getDouble("s");
+                    v.setScaleX(sc);
+                    v.setScaleY(sc);
+                }
+                selected = null;
+                invalidate();
+            } catch (Exception e) { }
+        });
     }
 }

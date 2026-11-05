@@ -43,6 +43,7 @@ public class EditorActivity extends Activity {
         bar.addView(add); bar.addView(del); bar.addView(save);
         root.addView(bar, new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END));
         setContentView(root);
+        ol.load("main");
 
         add.setOnClickListener(v -> new AlertDialog.Builder(this)
             .setItems(new String[]{"Teks", "Gambar/GIF"}, (dd, which) -> {
@@ -59,7 +60,8 @@ public class EditorActivity extends Activity {
             }).show());
         del.setOnClickListener(v -> ol.removeSelected());
         save.setOnClickListener(v -> {
-            Toast.makeText(this, "Tersimpan (simpan data menyusul)", Toast.LENGTH_SHORT).show();
+            ol.save("main");
+            Toast.makeText(this, "Tersimpan", Toast.LENGTH_SHORT).show();
         });
     }
 
