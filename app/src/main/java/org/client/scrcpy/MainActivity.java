@@ -1008,6 +1008,23 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
         surfaceView.getHolder().addCallback(surfaceCallback);
     }
 
+    private void setupOverlay() {
+        final OverlayLayer ol = findViewById(R.id.overlay_layer);
+        if (ol == null) return;
+        final android.widget.Button edit = findViewById(R.id.btn_edit);
+        edit.setOnClickListener(v -> {
+            ol.setEditMode(!ol.isEditMode());
+            edit.setText(ol.isEditMode() ? "Selesai" : "Edit");
+        });
+        findViewById(R.id.btn_add).setOnClickListener(v -> {
+            final android.widget.EditText et = new android.widget.EditText(this);
+            new android.app.AlertDialog.Builder(this).setTitle("Teks").setView(et)
+                .setPositiveButton("OK", (d, w) -> ol.addText(et.getText().toString()))
+                .setNegativeButton("Batal", null).show();
+        });
+        findViewById(R.id.btn_del).setOnClickListener(v -> ol.removeSelected());
+    }
+
     private void setupMirrorContentView() {
         syncLandscapeFromConfiguration();
         setMirrorContentView();
@@ -1015,6 +1032,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
         bindMirrorSurfaceHolder();
         setupNavBar();
         linearLayout = findViewById(R.id.container1);
+        setupOverlay();
     }
 
     @Override

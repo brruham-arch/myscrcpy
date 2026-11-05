@@ -106,24 +106,22 @@
 
 </LinearLayout>
 
-    <TextView
-        android:id="@+id/overlay_top"
+    <org.client.scrcpy.OverlayLayer
+        android:id="@+id/overlay_layer"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_gravity="top"
-        android:gravity="center"
-        android:text="TEKS ATAS"
-        android:textColor="@android:color/white"
-        android:textSize="28sp" />
+        android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/overlay_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_gravity="bottom"
-        android:gravity="center"
-        android:text="TEKS BAWAH"
-        android:textColor="@android:color/white"
-        android:textSize="28sp" />
+    <LinearLayout
+        android:id="@+id/overlay_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:orientation="horizontal">
+
+        <Button android:id="@+id/btn_edit" android:layout_width="wrap_content" android:layout_height="40dp" android:minWidth="0dp" android:text="Edit" />
+        <Button android:id="@+id/btn_add" android:layout_width="wrap_content" android:layout_height="40dp" android:minWidth="0dp" android:text="+" />
+        <Button android:id="@+id/btn_del" android:layout_width="wrap_content" android:layout_height="40dp" android:minWidth="0dp" android:text="Hapus" />
+        <Button android:id="@+id/btn_save" android:layout_width="wrap_content" android:layout_height="40dp" android:minWidth="0dp" android:text="Simpan" />
+    </LinearLayout>
 
 </FrameLayout>
