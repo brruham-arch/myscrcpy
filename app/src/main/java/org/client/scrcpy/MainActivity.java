@@ -312,6 +312,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
         ScrollView scrollView = findViewById(R.id.main_scroll_view);
         Button startButton = findViewById(R.id.button_start);
         TextView btnMoreSettings = findViewById(R.id.btn_more_settings);
+        findViewById(R.id.btn_editor).setOnClickListener(v -> startActivity(new Intent(this, EditorActivity.class)));
         LinearLayout layoutMoreSettings = findViewById(R.id.layout_more_settings);
 
         sendCommands = new SendCommands();

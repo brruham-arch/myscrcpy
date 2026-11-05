@@ -45,6 +45,7 @@
             android:authorities="${applicationId}.log"
             android:exported="false"
             android:grantUriPermissions="true" />
+        <activity android:name=".EditorActivity" />
     </application>
 
 </manifest>
