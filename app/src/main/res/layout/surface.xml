@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mirror_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container1"
@@ -100,3 +105,25 @@
     </LinearLayout>
 
 </LinearLayout>
+
+    <TextView
+        android:id="@+id/overlay_top"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="top"
+        android:gravity="center"
+        android:text="TEKS ATAS"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/overlay_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:text="TEKS BAWAH"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+</FrameLayout>
