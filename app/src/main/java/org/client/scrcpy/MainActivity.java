@@ -1028,8 +1028,8 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
                 float sw = getResources().getDisplayMetrics().widthPixels;
                 linearLayout.setTranslationX(gp.getFloat("gx", 0f) * sw);
                 linearLayout.setTranslationY(gp.getFloat("gy", 0f) * sw);
-                linearLayout.setScaleX(gp.getFloat("gs", 1f));
-                linearLayout.setScaleY(gp.getFloat("gs", 1f));
+                linearLayout.setScaleX(gp.getFloat("gsx", 1f));
+                linearLayout.setScaleY(gp.getFloat("gsy", 1f));
             }
             return;
         }

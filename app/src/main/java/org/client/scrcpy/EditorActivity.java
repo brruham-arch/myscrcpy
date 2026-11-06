@@ -43,13 +43,13 @@ public class EditorActivity extends Activity {
         android.content.SharedPreferences gp = getSharedPreferences("overlay", 0);
         game.setTranslationX(gp.getFloat("gx", 0f) * w);
         game.setTranslationY(gp.getFloat("gy", 0f) * w);
-        game.setScaleX(gp.getFloat("gs", 1f));
-        game.setScaleY(gp.getFloat("gs", 1f));
+        game.setScaleX(gp.getFloat("gsx", 1f));
+        game.setScaleY(gp.getFloat("gsy", 1f));
         final android.view.ScaleGestureDetector sd = new android.view.ScaleGestureDetector(this,
             new android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override public boolean onScale(android.view.ScaleGestureDetector d) {
-                    float s = Math.max(0.3f, Math.min(game.getScaleX() * d.getScaleFactor(), 4f));
-                    game.setScaleX(s); game.setScaleY(s);
+                    float f = d.getScaleFactor();
+                    game.setScaleX(Math.max(0.3f, Math.min(game.getScaleX() * f, 4f))); game.setScaleY(Math.max(0.3f, Math.min(game.getScaleY() * f, 4f)));
                     return true;
                 }
             });
@@ -58,23 +58,18 @@ public class EditorActivity extends Activity {
         game.setOnTouchListener((v, e) -> {
             int act0 = e.getActionMasked();
             if (act0 == android.view.MotionEvent.ACTION_DOWN) {
-                float m = 48f * getResources().getDisplayMetrics().density / game.getScaleX();
-                rs[0] = (e.getX() > v.getWidth() - m || e.getY() > v.getHeight() - m) ? 1f : 0f;
-                if (rs[0] == 1f) {
-                    int[] loc = new int[2];
-                    v.getLocationOnScreen(loc);
-                    rs[1] = loc[0] + v.getWidth() * v.getScaleX() / 2f;
-                    rs[2] = loc[1] + v.getHeight() * v.getScaleY() / 2f;
-                    rs[3] = (float) Math.hypot(e.getRawX() - rs[1], e.getRawY() - rs[2]);
-                    rs[4] = v.getScaleX();
-                }
+                float dn = getResources().getDisplayMetrics().density * 48f;
+                int md = 0;
+                if (e.getX() > v.getWidth() - dn / v.getScaleX()) md |= 1;
+                if (e.getY() > v.getHeight() - dn / v.getScaleY()) md |= 2;
+                rs[0] = md; rs[1] = e.getRawX(); rs[2] = e.getRawY();
+                rs[3] = v.getScaleX(); rs[4] = v.getScaleY();
             }
-            if (rs[0] == 1f) {
-                if (act0 == android.view.MotionEvent.ACTION_MOVE && rs[3] > 1f) {
-                    float dm = (float) Math.hypot(e.getRawX() - rs[1], e.getRawY() - rs[2]);
-                    float ns = Math.max(0.3f, Math.min(rs[4] * dm / rs[3], 4f));
-                    v.setScaleX(ns);
-                    v.setScaleY(ns);
+            if (rs[0] > 0f) {
+                if (act0 == android.view.MotionEvent.ACTION_MOVE && e.getPointerCount() == 1) {
+                    int md2 = (int) rs[0];
+                    if ((md2 & 1) != 0) v.setScaleX(Math.max(0.3f, Math.min(rs[3] + 2f * (e.getRawX() - rs[1]) / v.getWidth(), 4f)));
+                    if ((md2 & 2) != 0) v.setScaleY(Math.max(0.3f, Math.min(rs[4] + 2f * (e.getRawY() - rs[2]) / v.getHeight(), 4f)));
                 } else if (act0 == android.view.MotionEvent.ACTION_UP || act0 == android.view.MotionEvent.ACTION_CANCEL) {
                     rs[0] = 0f;
                 }
@@ -114,7 +109,7 @@ public class EditorActivity extends Activity {
         del.setOnClickListener(v -> ol.removeSelected());
         save.setOnClickListener(v -> {
             ol.save("main");
-            getSharedPreferences("overlay", 0).edit().putFloat("gx", game.getTranslationX() / w).putFloat("gy", game.getTranslationY() / w).putFloat("gs", game.getScaleX()).apply();
+            getSharedPreferences("overlay", 0).edit().putFloat("gx", game.getTranslationX() / w).putFloat("gy", game.getTranslationY() / w).putFloat("gsx", game.getScaleX()).putFloat("gsy", game.getScaleY()).apply();
             Toast.makeText(this, "Tersimpan", Toast.LENGTH_SHORT).show();
         });
     }
