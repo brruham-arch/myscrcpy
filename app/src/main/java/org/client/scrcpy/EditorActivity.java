@@ -22,7 +22,7 @@ public class EditorActivity extends Activity {
         root.setBackgroundColor(Color.parseColor("#222222"));
 
         // placeholder game landscape (16:9) di tengah
-        TextView game = new TextView(this); game.setText("AREA GAME"); game.setTextColor(Color.LTGRAY); game.setGravity(Gravity.CENTER);
+        TextView game = new TextView(this) { final android.graphics.Paint pp = new android.graphics.Paint(); { pp.setColor(Color.YELLOW); pp.setStrokeWidth(4f); } @Override protected void onDraw(android.graphics.Canvas c) { super.onDraw(c); float cx = getWidth() / 2f, cy = getHeight() / 2f; c.drawLine(cx - 40, cy, cx + 40, cy, pp); c.drawLine(cx, cy - 40, cx, cy + 40, pp); } }; game.setText("AREA GAME\n(tarik tepi kanan/bawah = skala)"); game.setTextColor(Color.LTGRAY); game.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
         game.setBackgroundColor(Color.parseColor("#555555"));
         int w = getResources().getDisplayMetrics().widthPixels;
         root.addView(game, new FrameLayout.LayoutParams(w, w * 9 / 16, Gravity.CENTER));
@@ -54,7 +54,32 @@ public class EditorActivity extends Activity {
                 }
             });
         final float[] last = new float[2];
+        final float[] rs = new float[5];
         game.setOnTouchListener((v, e) -> {
+            int act0 = e.getActionMasked();
+            if (act0 == android.view.MotionEvent.ACTION_DOWN) {
+                float m = 48f * getResources().getDisplayMetrics().density / game.getScaleX();
+                rs[0] = (e.getX() > v.getWidth() - m || e.getY() > v.getHeight() - m) ? 1f : 0f;
+                if (rs[0] == 1f) {
+                    int[] loc = new int[2];
+                    v.getLocationOnScreen(loc);
+                    rs[1] = loc[0] + v.getWidth() * v.getScaleX() / 2f;
+                    rs[2] = loc[1] + v.getHeight() * v.getScaleY() / 2f;
+                    rs[3] = (float) Math.hypot(e.getRawX() - rs[1], e.getRawY() - rs[2]);
+                    rs[4] = v.getScaleX();
+                }
+            }
+            if (rs[0] == 1f) {
+                if (act0 == android.view.MotionEvent.ACTION_MOVE && rs[3] > 1f) {
+                    float dm = (float) Math.hypot(e.getRawX() - rs[1], e.getRawY() - rs[2]);
+                    float ns = Math.max(0.3f, Math.min(rs[4] * dm / rs[3], 4f));
+                    v.setScaleX(ns);
+                    v.setScaleY(ns);
+                } else if (act0 == android.view.MotionEvent.ACTION_UP || act0 == android.view.MotionEvent.ACTION_CANCEL) {
+                    rs[0] = 0f;
+                }
+                return true;
+            }
             sd.onTouchEvent(e);
             int a = e.getActionMasked();
             if (a == android.view.MotionEvent.ACTION_DOWN) {
