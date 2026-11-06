@@ -313,6 +313,9 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
         Button startButton = findViewById(R.id.button_start);
         TextView btnMoreSettings = findViewById(R.id.btn_more_settings);
         findViewById(R.id.btn_editor).setOnClickListener(v -> startActivity(new Intent(this, EditorActivity.class)));
+        android.widget.CheckBox cbView = findViewById(R.id.chk_view_mode);
+        cbView.setChecked(getSharedPreferences("overlay", 0).getBoolean("view_mode", false));
+        cbView.setOnCheckedChangeListener((b, c) -> getSharedPreferences("overlay", 0).edit().putBoolean("view_mode", c).apply());
         LinearLayout layoutMoreSettings = findViewById(R.id.layout_more_settings);
 
         sendCommands = new SendCommands();
@@ -896,7 +899,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
 
     @SuppressLint("SourceLockedOrientationActivity")
     private void applyClientOrientationFromRemote() {
-        if (PreUtils.get(context, Constant.CONTROL_NO, false)) { return; }
+        if (getSharedPreferences("overlay", 0).getBoolean("view_mode", false)) { return; }
         if (scrcpy == null) {
             return;
         }
@@ -1012,7 +1015,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
     private void setupOverlay() {
         final OverlayLayer ol = findViewById(R.id.overlay_layer);
         if (ol == null) return;
-        if (!PreUtils.get(context, Constant.CONTROL_NO, false)) {
+        if (!getSharedPreferences("overlay", 0).getBoolean("view_mode", false)) {
             ol.setVisibility(View.GONE);
             View tb0 = findViewById(R.id.overlay_toolbar);
             if (tb0 != null) tb0.setVisibility(View.GONE);
@@ -1107,7 +1110,7 @@ public class MainActivity extends Activity implements Scrcpy.ServiceCallbacks, S
     @SuppressLint("ClickableViewAccessibility")
     private void start_screen_copy_magic() {
         stopStatusMonitor();
-        setRequestedOrientation(PreUtils.get(context, Constant.CONTROL_NO, false) ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        setRequestedOrientation(getSharedPreferences("overlay", 0).getBoolean("view_mode", false) ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         setupMirrorContentView();
     }
 
